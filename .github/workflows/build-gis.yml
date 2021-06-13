@@ -1,0 +1,51 @@
+name: Build GIS geojson
+on:
+    release:
+        types: [published]
+        branches:
+            - geojson-generation
+jobs:
+    build-map:
+        name: build geojson
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                shell: bash
+        steps:
+            - uses: actions/checkout@master
+              with:
+                  path: main
+            - uses: actions/checkout@master
+              with:
+                repository: tmrowco/electricitymap-contrib
+                path: electricitymap
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: '12'
+            - name: install yarn modules
+              run: yarn
+              working-directory: electricitymap/web
+            - name: generate map
+              run: mkdir -p public/dist/ && bash topogen.sh
+              working-directory: electricitymap/web
+            - name: copy the result
+              run: cp electricitymap/web/public/dist/zonegeometries.json main/zones.geojson
+            - uses: actions/setup-python@v2
+              with:
+                python-version: '3.x'
+            - name: seperate the zones
+              run: python3 split_geojson.py
+              working-directory: main
+            - name: upload the artifacts
+              uses: actions/upload-artifact@v2
+              with:
+                name: geojson-zones
+                path: main/zones/*.geojson
+            - name: package for release
+              run: zip geojson.zip main/zones/*
+            - name: upload to the release
+              uses: svenstaro/upload-release-action@2.2.1
+              with:
+                repo_token: ${{ secrets.GITHUB_TOKEN }}
+                file: geojson.zip
+                tag: ${{ github.ref }} 
