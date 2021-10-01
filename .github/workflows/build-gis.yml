@@ -32,7 +32,11 @@ jobs:
               run: cp electricitymap/web/public/dist/zonegeometries.json main/zones.geojson
             - uses: actions/setup-python@v2
               with:
-                python-version: '3.x'
+                python-version: '3.9'
+            - name: install dependencies
+              uses: py-actions/py-dependency-install@v2
+              with:
+                path: "main/requirements.txt"
             - name: seperate the zones
               run: python3 split_geojson.py
               working-directory: main
