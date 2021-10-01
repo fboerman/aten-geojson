@@ -26,7 +26,7 @@ jobs:
               run: yarn
               working-directory: electricitymap/web
             - name: generate map
-              run: mkdir -p public/dist/ && bash topogen.sh
+              run: mkdir -p public/dist/ && bash geo/topogen.sh
               working-directory: electricitymap/web
             - name: copy the result
               run: cp electricitymap/web/public/dist/zonegeometries.json main/zones.geojson

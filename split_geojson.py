@@ -19,6 +19,6 @@ with open('zones.geojson', 'r') as stream:
 # so we do this ourselves with disolve from geopandas
 # execute this on each zone. if its not needed the same geojson will come back
 for zone_file in glob('zones/*.geojson'):
-    df = gdp.readfile(zone_file)
+    df = gdp.read_file(zone_file)
     df = df.dissolve()
-    df.to_file(zone_file)
+    df.to_file(zone_file, driver='GeoJSON')
